@@ -54,11 +54,16 @@ import { MedicalDisclaimer } from './components/common/MedicalDisclaimer';
 import { EmptyState } from './components/common/EmptyState';
 import { StatusBadge } from './components/common/StatusBadge';
 import { AdminPortal } from './components/admin/AdminPortal';
+import { ApiConfigModal } from './components/common/ApiConfigModal';
+import { isDemoMode } from './services/api';
 
 export const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, loading, login, register, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  // API Config Modal state
+  const [showApiModal, setShowApiModal] = useState(false);
 
   // Auth Mode: 'signin' | 'signup'
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
@@ -519,6 +524,19 @@ export const App: React.FC = () => {
             title="Toggle Light/Dark Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+          </button>
+
+          {/* API Backend Connection Indicator */}
+          <button
+            type="button"
+            onClick={() => setShowApiModal(true)}
+            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition-all cursor-pointer"
+            title="Configure API Backend Connection (Demo Mode vs Live Server)"
+          >
+            <span className={`w-2 h-2 rounded-full ${isDemoMode() ? 'bg-teal-500 animate-pulse' : 'bg-emerald-500'}`} />
+            <span className="text-[11px] text-slate-700 dark:text-slate-300 hidden sm:inline">
+              {isDemoMode() ? 'Demo Mode' : 'Live API'}
+            </span>
           </button>
 
           {/* User Profile Pill or Status */}
@@ -2204,6 +2222,9 @@ export const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* API Connection Configuration Modal */}
+      <ApiConfigModal isOpen={showApiModal} onClose={() => setShowApiModal(false)} />
     </div>
   );
 };

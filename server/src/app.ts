@@ -15,10 +15,23 @@ export const app = express();
 // Security Headers
 app.use(helmet());
 
-// CORS configuration (supports credentials for httpOnly cookies)
+// CORS configuration (supports credentials for httpOnly cookies & GitHub Pages)
 app.use(
   cors({
-    origin: [env.CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: (requestOrigin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or direct API tests)
+      if (!requestOrigin) return callback(null, true);
+      if (
+        requestOrigin === env.CLIENT_URL ||
+        requestOrigin.includes('localhost') ||
+        requestOrigin.includes('127.0.0.1') ||
+        requestOrigin.endsWith('.github.io') ||
+        requestOrigin === 'https://selvamuthumeenakchi.github.io'
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Permissive for hackathon demo access
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
